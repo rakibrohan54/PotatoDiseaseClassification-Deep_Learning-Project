@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potato Disease Prediction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #ece9e6, #ffffff);
+            color: #333;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+        }
+
+        h1 {
+            color: #4CAF50;
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        #image-preview {
+            width: 300px;
+            height: 300px;
+            border: 3px dashed #4CAF50;
+            border-radius: 10px;
+            margin: 20px auto;
+            display: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        #image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-block;
+            margin: 10px;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        label:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #007bb5;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+            animation: fadeIn 0.5s;
+        }
+
+        footer {
+            margin-top: 50px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .container:hover {
+            transform: scale(1.02);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        #loading {
+            display: none;
+            font-size: 20px;
+            color: #4CAF50;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Potato Disease Prediction</h1>
+        <h2>Upload an Image for Analysis</h2>
+
+        <div id="image-preview">
+            <img id="preview" src="#" alt="Image Preview" />
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*" onchange="previewImage(event)">
+        <label for="fileInput"><i class="fas fa-upload"></i> Choose an Image</label>
+        
+        <button id="predictButton" onclick="predict()">Predict</button>
+        
+        <div id="loading">Loading...</div>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function previewImage(event) {
+            const preview = document.getElementById('preview');
+            const imagePreview = document.getElementById('image-preview');
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function() {
+                preview.src = reader.result;
+                imagePreview.style.display = 'block';
+                imagePreview.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    imagePreview.style.transform = 'scale(1)';
+                }, 300);
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function predict() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result');
+            const loadingIndicator = document.getElementById('loading');
+
+            if (fileInput.files.length === 0) {
+                resultDiv.innerText = 'Please select an image!';
+                return;
+            }
+
+            loadingIndicator.style.display = 'block'; // Show loading indicator
+
+            const reader = new FileReader();
+            reader.readAsDataURL(fileInput.files[0]);
+            reader.onloadend = async function() {
+                const base64Image = reader.result.split(',')[1];
+
+                try {
+                    const response = await fetch('/predict', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ image: base64Image }),
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        resultDiv.innerText = 'Prediction: ' + data[0].image;
+                    } else {
+                        const errorData = await response.json();
+                        resultDiv.innerText = 'Error: ' + (errorData.error || 'An error occurred.');
+                    }
+                } catch (error) {
+                    resultDiv.innerText = 'Error occurred while predicting: ' + error.message;
+                } finally {
+                    loadingIndicator.style.display = 'none'; // Hide loading indicator
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

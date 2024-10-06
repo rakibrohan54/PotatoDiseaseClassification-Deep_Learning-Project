@@ -39,6 +39,7 @@ class Training:
             directory=self.config.training_data,
             subset="validation",
             shuffle=False,
+            class_mode='sparse',
             **dataflow_kwargs
         )
 
@@ -60,6 +61,7 @@ class Training:
             directory=self.config.training_data,
             subset="training",
             shuffle=True,
+            class_mode='sparse',  # This should be set to 'sparse'
             **dataflow_kwargs
         )
 
@@ -70,8 +72,8 @@ class Training:
     def train(self):
         # Compile the model before training
         self.model.compile(
-            optimizer=tf.keras.optimizers.SGD(learning_rate=self.config.params_learning_rate),
-            loss=tf.keras.losses.CategoricalCrossentropy(),
+            optimizer=tf.keras.optimizers.Adam(learning_rate=self.config.params_learning_rate),
+            loss=tf.keras.losses.SparseCategoricalCrossentropy(),
             metrics=["accuracy"]
         )
 
@@ -93,3 +95,4 @@ class Training:
             path=self.config.trained_model_path,
             model=self.model
         )
+
