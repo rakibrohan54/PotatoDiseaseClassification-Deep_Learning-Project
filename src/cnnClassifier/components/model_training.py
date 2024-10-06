@@ -38,7 +38,7 @@ class Training:
         self.valid_generator = valid_datagenerator.flow_from_directory(
             directory=self.config.training_data,
             subset="validation",
-            shuffle=False,
+            shuffle=True,
             class_mode='sparse',
             **dataflow_kwargs
         )
