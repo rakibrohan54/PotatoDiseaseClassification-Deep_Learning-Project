@@ -22,7 +22,7 @@ class ClientApp:
 @app.route("/", methods=['GET'])
 @cross_origin()
 def home():
-    return render_template('index1.html')
+    return render_template('index2.html')
 
 
 
