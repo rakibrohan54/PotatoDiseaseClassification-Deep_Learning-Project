@@ -3,7 +3,7 @@ import os
 from cnnClassifier.utils.common import read_yaml, create_directories,save_json
 from cnnClassifier.entity.config_entity import (DataIngestionConfig,
                                                 PrepareBaseModelConfig,
-                                                TrainingConfig)
+                                                TrainingConfig,EvaluationConfig)
 
 
 class ConfigurationManager:
@@ -79,8 +79,16 @@ class ConfigurationManager:
 
         return training_config
     
-
-    
+    def get_evaluation_config(self) -> EvaluationConfig:
+        eval_config = EvaluationConfig(
+            path_of_model="artifacts/training/model.h5",
+            training_data="artifacts/data_ingestion/final_potato_diease_data",
+            mlflow_uri="https://dagshub.com/rakibrohan54/PotatoDiseaseClassification-Deep_Learning-Project.mlflow",
+            all_params=self.params,
+            params_image_size=self.params.IMAGE_SIZE,
+            params_batch_size=self.params.BATCH_SIZE
+        )
+        return eval_config
 
 
 
