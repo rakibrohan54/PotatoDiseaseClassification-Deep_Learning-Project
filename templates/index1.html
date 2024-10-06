@@ -172,6 +172,25 @@
                 padding: 15px;
             }
         }
+
+        /* New styles for circular image */
+        .profile-image {
+            width: 100px; /* Adjust the size as needed */
+            height: 100px; /* Adjust the size as needed */
+            border-radius: 50%; /* Makes the image circular */
+            overflow: hidden;
+            border: 3px solid #d32f2f; /* Optional: Border around the circle */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin: 20px auto;
+            position: relative;
+            top: -20px; /* Adjusts vertical positioning */
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Maintains aspect ratio */
+        }
     </style>
 </head>
 <body>
@@ -191,6 +210,11 @@
         
         <div id="loading">Loading...</div>
         <div class="result" id="result"></div>
+
+        <!-- Circular profile image -->
+        <div class="profile-image">
+            <img src="https://avatars.githubusercontent.com/u/71736510?v=4" alt="Author Profile">
+        </div>
     </div>
 
     <footer>
